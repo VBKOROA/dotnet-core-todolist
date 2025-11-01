@@ -39,4 +39,20 @@ app.MapGet("/todos/{id}", async (int id, TodoDb todoDb) =>
 .WithName("Get Todo")
 .WithOpenApi();
 
+app.MapPut("/todos", async (Todo requestTodo, TodoDb todoDb) =>
+{
+    var todo = await todoDb.Todos.FindAsync(requestTodo.Id);
+
+    if (todo is null) return Results.NotFound();
+
+    todo.Name = requestTodo.Name;
+    todo.IsComplete = requestTodo.IsComplete;
+
+    await todoDb.SaveChangesAsync();
+
+    return Results.NoContent();
+})
+.WithName("Update Todo")
+.WithOpenApi();
+
 app.Run();
