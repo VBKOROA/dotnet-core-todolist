@@ -63,4 +63,17 @@ app.MapGet("/todos", async (TodoDb todoDb) => await todoDb.Todos.ToListAsync())
 .WithName("Get Todos")
 .WithOpenApi();
 
+app.MapDelete("/todos/{id}", async (int id, TodoDb todoDb) =>
+{
+    var todo = await todoDb.Todos.FindAsync(id);
+
+    if (todo is null) return Results.NotFound();
+
+    todoDb.Todos.Remove(todo);
+    await todoDb.SaveChangesAsync();
+    return Results.NoContent();
+})
+.WithName("Delete Todo")
+.WithOpenApi();
+
 app.Run();
