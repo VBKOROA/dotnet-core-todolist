@@ -30,4 +30,13 @@ app.MapPost("/todos", async (Todo todo, TodoDb db) =>
 .WithName("Create Todo")
 .WithOpenApi();
 
+app.MapGet("/todos/{id}", async (int id, TodoDb todoDb) =>
+{
+    return await todoDb.Todos.FindAsync(id) is Todo todo
+        ? Results.Ok(todo)
+        : Results.NotFound();
+})
+.WithName("Get Todo")
+.WithOpenApi();
+
 app.Run();
