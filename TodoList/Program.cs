@@ -55,4 +55,8 @@ app.MapPut("/todos", async (Todo requestTodo, TodoDb todoDb) =>
 .WithName("Update Todo")
 .WithOpenApi();
 
+app.MapGet("/todos", async (TodoDb todoDb) => await todoDb.Todos.ToListAsync())
+.WithName("Get Todos")
+.WithOpenApi();
+
 app.Run();
