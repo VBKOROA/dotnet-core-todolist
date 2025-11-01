@@ -21,7 +21,9 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.MapPost("/todos", async (Todo todo, TodoDb db) =>
+var todoGroup = app.MapGroup("/todos");
+
+todoGroup.MapPost("/", async (Todo todo, TodoDb db) =>
 {
     db.Todos.Add(todo);
     await db.SaveChangesAsync();
@@ -30,7 +32,7 @@ app.MapPost("/todos", async (Todo todo, TodoDb db) =>
 .WithName("Create Todo")
 .WithOpenApi();
 
-app.MapGet("/todos/{id}", async (int id, TodoDb todoDb) =>
+todoGroup.MapGet("/{id}", async (int id, TodoDb todoDb) =>
 {
     return await todoDb.Todos.FindAsync(id) is Todo todo
         ? Results.Ok(todo)
@@ -39,7 +41,7 @@ app.MapGet("/todos/{id}", async (int id, TodoDb todoDb) =>
 .WithName("Get Todo")
 .WithOpenApi();
 
-app.MapPut("/todos", async (Todo requestTodo, TodoDb todoDb) =>
+todoGroup.MapPut("/", async (Todo requestTodo, TodoDb todoDb) =>
 {
     var todo = await todoDb.Todos.FindAsync(requestTodo.Id);
 
@@ -55,15 +57,15 @@ app.MapPut("/todos", async (Todo requestTodo, TodoDb todoDb) =>
 .WithName("Update Todo")
 .WithOpenApi();
 
-app.MapGet("/todos/complete", async (TodoDb todoDb) => await todoDb.Todos.Where(t => t.IsComplete).ToListAsync())
+todoGroup.MapGet("/complete", async (TodoDb todoDb) => await todoDb.Todos.Where(t => t.IsComplete).ToListAsync())
 .WithName("Get Complete Todos")
 .WithOpenApi();
 
-app.MapGet("/todos", async (TodoDb todoDb) => await todoDb.Todos.ToListAsync())
+todoGroup.MapGet("/", async (TodoDb todoDb) => await todoDb.Todos.ToListAsync())
 .WithName("Get Todos")
 .WithOpenApi();
 
-app.MapDelete("/todos/{id}", async (int id, TodoDb todoDb) =>
+todoGroup.MapDelete("/{id}", async (int id, TodoDb todoDb) =>
 {
     var todo = await todoDb.Todos.FindAsync(id);
 
