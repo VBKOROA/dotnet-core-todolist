@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
+using TodoList.Data;
+using TodoList.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,8 +10,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddDbContext<TodoDb>(opt => opt.UseInMemoryDatabase("TodoList"));
+builder.Services.AddDbContext<AppDbContext>(opt => opt.UseInMemoryDatabase("TodoList"));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+
+builder.Services.AddControllers(); 
 
 var app = builder.Build();
 
@@ -22,61 +26,63 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-var todoGroup = app.MapGroup("/todos");
+app.MapControllers();
 
-todoGroup.MapPost("/", async Task<Created<Todo>> (Todo todo, TodoDb db) =>
-{
-    db.Todos.Add(todo);
-    await db.SaveChangesAsync();
-    return TypedResults.Created($"/todos/{todo.Id}", todo);
-})
-.WithName("Create Todo")
-.WithOpenApi();
+// var todoGroup = app.MapGroup("/todos");
 
-todoGroup.MapGet("/{id}", async Task<Results<Ok<Todo>, NotFound>> (int id, TodoDb todoDb) =>
-{
-    return await todoDb.Todos.FindAsync(id) is Todo todo
-        ? TypedResults.Ok(todo)
-        : TypedResults.NotFound();
-})
-.WithName("Get Todo")
-.WithOpenApi();
+// todoGroup.MapPost("/", async Task<Created<Todo>> (Todo todo, AppDbContext context) =>
+// {
+//     context.Todos.Add(todo);
+//     await context.SaveChangesAsync();
+//     return TypedResults.Created($"/todos/{todo.Id}", todo);
+// })
+// .WithName("Create Todo")
+// .WithOpenApi();
 
-todoGroup.MapPut("/", async Task<Results<NotFound, NoContent>> (Todo requestTodo, TodoDb todoDb) =>
-{
-    var todo = await todoDb.Todos.FindAsync(requestTodo.Id);
+// todoGroup.MapGet("/{id}", async Task<Results<Ok<Todo>, NotFound>> (int id, AppDbContext context) =>
+// {
+//     return await context.Todos.FindAsync(id) is Todo todo
+//         ? TypedResults.Ok(todo)
+//         : TypedResults.NotFound();
+// })
+// .WithName("Get Todo")
+// .WithOpenApi();
 
-    if (todo is null) return TypedResults.NotFound();
+// todoGroup.MapPut("/", async Task<Results<NotFound, NoContent>> (Todo requestTodo, AppDbContext context) =>
+// {
+//     var todo = await context.Todos.FindAsync(requestTodo.Id);
 
-    todo.Name = requestTodo.Name;
-    todo.IsComplete = requestTodo.IsComplete;
+//     if (todo is null) return TypedResults.NotFound();
 
-    await todoDb.SaveChangesAsync();
+//     todo.Name = requestTodo.Name;
+//     todo.IsComplete = requestTodo.IsComplete;
 
-    return TypedResults.NoContent();
-})
-.WithName("Update Todo")
-.WithOpenApi();
+//     await context.SaveChangesAsync();
 
-todoGroup.MapGet("/complete", async Task<Ok<List<Todo>>> (TodoDb todoDb) => TypedResults.Ok(await todoDb.Todos.Where(t => t.IsComplete).ToListAsync()))
-.WithName("Get Complete Todos")
-.WithOpenApi();
+//     return TypedResults.NoContent();
+// })
+// .WithName("Update Todo")
+// .WithOpenApi();
 
-todoGroup.MapGet("/", async Task<Ok<List<Todo>>> (TodoDb todoDb) => TypedResults.Ok(await todoDb.Todos.ToListAsync()))
-.WithName("Get Todos")
-.WithOpenApi();
+// todoGroup.MapGet("/complete", async Task<Ok<List<Todo>>> (AppDbContext context) => TypedResults.Ok(await context.Todos.Where(t => t.IsComplete).ToListAsync()))
+// .WithName("Get Complete Todos")
+// .WithOpenApi();
 
-todoGroup.MapDelete("/{id}", async Task<Results<NotFound, NoContent>> (int id, TodoDb todoDb) =>
-{
-    var todo = await todoDb.Todos.FindAsync(id);
+// todoGroup.MapGet("/", async Task<Ok<List<Todo>>> (AppDbContext context) => TypedResults.Ok(await context.Todos.ToListAsync()))
+// .WithName("Get Todos")
+// .WithOpenApi();
 
-    if (todo is null) return TypedResults.NotFound();
+// todoGroup.MapDelete("/{id}", async Task<Results<NotFound, NoContent>> (int id, AppDbContext context) =>
+// {
+//     var todo = await context.Todos.FindAsync(id);
 
-    todoDb.Todos.Remove(todo);
-    await todoDb.SaveChangesAsync();
-    return TypedResults.NoContent();
-})
-.WithName("Delete Todo")
-.WithOpenApi();
+//     if (todo is null) return TypedResults.NotFound();
+
+//     context.Todos.Remove(todo);
+//     await context.SaveChangesAsync();
+//     return TypedResults.NoContent();
+// })
+// .WithName("Delete Todo")
+// .WithOpenApi();
 
 app.Run();
