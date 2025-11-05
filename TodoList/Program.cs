@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using TodoList.Data;
-using TodoList.Models;
+using TodoList.Features.Todos;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,7 +26,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.MapControllers();
+app.MapTodoEndpoints();
 
 // var todoGroup = app.MapGroup("/todos");
 
