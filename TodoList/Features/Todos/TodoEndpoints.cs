@@ -1,13 +1,19 @@
-namespace TodoList.Features.Todos;
+using TodoList.Common.Filters;
+using TodoList.Features.Todos.CreateTodo;
 
-public static class TodoEndpoints
+namespace TodoList.Features.Todos
 {
-    public static void MapTodoEndpoints(this IEndpointRouteBuilder routes)
+    public static class TodoEndpoints
     {
-        var todoGroup = routes.MapGroup("/todos");
+        public static void MapTodoEndpoints(this IEndpointRouteBuilder routes)
+        {
+            var todoGroup = routes.MapGroup("/todos");
 
-        todoGroup.MapPost("/", CreateTodo.RequestHandler)
-        .WithName("Create Todo")
-        .WithOpenApi();
+            todoGroup.MapPost("/", CreateTodoEndpoint.HandlerAsync)
+            .WithName("Create Todo")
+            .WithOpenApi()
+            .AddEndpointFilter<ValidationFilter<CreateTodoRequest>>();
+        }
     }
 }
+
