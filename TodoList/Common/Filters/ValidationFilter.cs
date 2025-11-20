@@ -2,14 +2,9 @@ using FluentValidation;
 
 namespace TodoList.Common.Filters
 {
-    public class ValidationFilter<T> : IEndpointFilter where T : class
+    public class ValidationFilter<T>(IValidator<T> validator) : IEndpointFilter where T : class
     {
-        private readonly IValidator<T> _validator;
-
-        public ValidationFilter(IValidator<T> validator)
-        {
-            _validator = validator;
-        }
+        private readonly IValidator<T> _validator = validator;
 
         public async ValueTask<object?> InvokeAsync(EndpointFilterInvocationContext context, EndpointFilterDelegate next)
         {
@@ -21,6 +16,7 @@ namespace TodoList.Common.Filters
             }
 
             var validationResult = await _validator.ValidateAsync(model);
+            
             if (!validationResult.IsValid)
             {
                 return Results.ValidationProblem(validationResult.ToDictionary());

@@ -1,3 +1,5 @@
+
+
 namespace TodoList.Features.Todos.Model
 {
     public class Todo
@@ -11,6 +13,16 @@ namespace TodoList.Features.Todos.Model
         public Todo(string? name, bool isComplete)
         {
             Name = name;
+            IsComplete = isComplete;
+        }
+
+        public void updateName(string name)
+        {
+            Name = name;
+        }
+
+        public void updateComplete(bool isComplete)
+        {
             IsComplete = isComplete;
         }
     }
