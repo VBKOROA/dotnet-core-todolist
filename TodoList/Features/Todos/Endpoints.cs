@@ -1,5 +1,6 @@
 using TodoList.Common.Filters;
 using TodoList.Features.Todos.CreateTodo;
+using TodoList.Features.Todos.DeleteTodoById;
 using TodoList.Features.Todos.EditTodoById;
 using TodoList.Features.Todos.GetTodoById;
 
@@ -24,6 +25,10 @@ namespace TodoList.Features.Todos
             .WithName("Edit Todo By Id")
             .WithOpenApi()
             .AddEndpointFilter<ValidationFilter<EditTodoByIdRequest>>();
+
+            todoGroup.MapDelete("/{id}", DeleteTodoByIdEndpoint.HandleAsync)
+            .WithName("Delete Todo By Id")
+            .WithOpenApi();
         }
     }
 }
