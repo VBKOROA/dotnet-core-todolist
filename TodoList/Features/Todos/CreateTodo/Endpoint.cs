@@ -7,12 +7,12 @@ namespace TodoList.Features.Todos.CreateTodo
     public class CreateTodoEndpoint
     {
 
-        public static async Task<Created<Todo>> HandlerAsync(CreateTodoRequest request, AppDbContext context)
+        public static async Task<Ok<Todo>> HandlerAsync(CreateTodoRequest request, AppDbContext context)
         {
             var todo = new Todo(request.Name, request.IsComplete);
             context.Todos.Add(todo);
             await context.SaveChangesAsync();
-            return TypedResults.Created($"/todos/{todo.Id}", todo);
+            return TypedResults.Ok(todo);
         }
     }
 }
